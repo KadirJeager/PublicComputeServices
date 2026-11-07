@@ -7,6 +7,7 @@ import android.provider.Settings
 import com.kieronquinn.app.pcs.asi.AsFlagOverrides
 import com.kieronquinn.app.pcs.repositories.DeviceConfigPropertiesRepository.Companion.AS_FORCE_GSA
 import com.kieronquinn.app.pcs.repositories.DeviceConfigPropertiesRepository.Companion.AS_GEMINI_DAILY_BRIEF
+import com.kieronquinn.app.pcs.repositories.DeviceConfigPropertiesRepository.Companion.AS_LIVE_TRANSLATE_LANGUAGE
 import com.kieronquinn.app.pcs.repositories.DeviceConfigPropertiesRepository.Companion.AS_NOTIFICATION_ORGANIZER
 import com.kieronquinn.app.pcs.repositories.DeviceConfigPropertiesRepository.Companion.AS_SHOW_NOW_PLAYING_NOTIFICATION
 import com.kieronquinn.app.pcs.utils.extensions.SystemProperties_get
@@ -78,11 +79,13 @@ object AsHooks: XposedHooks {
     private fun hookLanguageFeatures(loadPackageParam: LoadPackageParam) {
         val notificationOrganizer = SystemProperties_getBoolean(AS_NOTIFICATION_ORGANIZER, false)
         val dailyBrief = SystemProperties_getBoolean(AS_GEMINI_DAILY_BRIEF, false)
-        if (!notificationOrganizer && !dailyBrief) return
+        val liveTranslate = SystemProperties_getBoolean(AS_LIVE_TRANSLATE_LANGUAGE, false)
+        if (!notificationOrganizer && !dailyBrief && !liveTranslate) return
         val locale = Resources.getSystem().configuration.locales.get(0)
         val overrides = AsFlagOverrides.Builder().apply {
             if (notificationOrganizer) plus(AsFlagOverrides.notificationOrganizer(locale, simCountry()))
             if (dailyBrief) plus(AsFlagOverrides.geminiDailyBrief())
+            if (liveTranslate) plus(AsFlagOverrides.liveTranslate(locale))
         }.build()
         val dexKit = loadDexKit(loadPackageParam.appInfo.sourceDir)
         AsFlagHooks.install(dexKit, loadPackageParam.classLoader, overrides)

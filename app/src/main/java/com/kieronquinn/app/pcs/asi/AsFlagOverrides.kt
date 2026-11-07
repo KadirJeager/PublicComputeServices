@@ -27,6 +27,15 @@ class AsFlagOverrides private constructor(
             .add("${NOTIFICATIONS}supported_languages", locale.language)
             .apply { country?.let { add("${NOTIFICATIONS}bundle_supported_countries", it) } }
 
+        /**
+         *  Voice Translate (Live Translate in calls) in [locale]'s language. ASI only offers the
+         *  languages in its interpreter lists (comma separated, `de,en,ja` by default) on either
+         *  side of the call.
+         */
+        fun liveTranslate(locale: Locale) = Builder()
+            .add("Translate__interpreter_source_languages", locale.language)
+            .add("Translate__interpreter_target_languages", locale.language)
+
         /** Gemini's daily brief in At a Glance; Google turns it on per device from the server. */
         fun geminiDailyBrief() = Builder()
             .boolean("EchoSmartspace__enable_gemini_ambient_data", true)
@@ -66,6 +75,12 @@ class AsFlagOverrides private constructor(
             current.none { it.equals(entry, ignoreCase = true) }
         }.distinctBy { it.lowercase(Locale.ROOT) }
         return if (missing.isEmpty()) null else current + missing
+    }
+
+    /** [list] for a flag that holds a comma separated list (`de,en,ja`). */
+    fun commaList(name: String, current: String): String? {
+        val entries = current.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+        return list(name, entries)?.joinToString(",")
     }
 
 }

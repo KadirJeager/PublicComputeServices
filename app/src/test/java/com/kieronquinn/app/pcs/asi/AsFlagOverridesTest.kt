@@ -64,4 +64,19 @@ class AsFlagOverridesTest {
         assertEquals(true, both.boolean("SmartNotification__enable_notification_bundle"))
     }
 
+    @Test
+    fun `live translate adds the language to both interpreter lists`() {
+        val overrides = AsFlagOverrides.liveTranslate(Locale.forLanguageTag("tr-TR")).build()
+        assertEquals("de,en,ja,tr", overrides.commaList("Translate__interpreter_source_languages", "de,en,ja"))
+        assertEquals("de,en,ja,tr", overrides.commaList("Translate__interpreter_target_languages", "de, en ,ja,"))
+        assertNull(overrides.commaList("Translate__interpreter_source_languages", "de,TR"))
+        assertNull(overrides.commaList("Translate__live_captions_translate_languages", "de,en"))
+    }
+
+    @Test
+    fun `empty comma list gets the language`() {
+        val overrides = AsFlagOverrides.liveTranslate(Locale.FRENCH).build()
+        assertEquals("fr", overrides.commaList("Translate__interpreter_target_languages", ""))
+    }
+
 }

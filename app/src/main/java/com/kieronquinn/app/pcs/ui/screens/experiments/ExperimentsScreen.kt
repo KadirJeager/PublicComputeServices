@@ -93,6 +93,7 @@ private data class Interactions(
     val onAiCoreUnloadInferenceChanged: (Boolean) -> Unit,
     val onAsNotificationOrganizerChanged: (Boolean) -> Unit,
     val onAsGeminiDailyBriefChanged: (Boolean) -> Unit,
+    val onAsLiveTranslateLanguageChanged: (Boolean) -> Unit,
     val onClearMddClicked: () -> Unit,
     val onPhoneEnabledChanged: (Boolean) -> Unit,
     val onTtsEnabledChanged: (Boolean) -> Unit,
@@ -142,6 +143,7 @@ private data class Interactions(
             onAiCoreUnloadInferenceChanged = {},
             onAsNotificationOrganizerChanged = {},
             onAsGeminiDailyBriefChanged = {},
+            onAsLiveTranslateLanguageChanged = {},
             onClearMddClicked = {},
             onPhoneEnabledChanged = {},
             onTtsEnabledChanged = {},
@@ -197,6 +199,7 @@ fun ExperimentsScreen() = ProvidePreferenceLocals {
         onAiCoreUnloadInferenceChanged = viewModel::onAiCoreUnloadInferenceChanged,
         onAsNotificationOrganizerChanged = viewModel::onAsNotificationOrganizerChanged,
         onAsGeminiDailyBriefChanged = viewModel::onAsGeminiDailyBriefChanged,
+        onAsLiveTranslateLanguageChanged = viewModel::onAsLiveTranslateLanguageChanged,
         onClearMddClicked = viewModel::onClearMddClicked,
         onPhoneEnabledChanged = viewModel::onPhoneEnabledChanged,
         onTtsEnabledChanged = viewModel::onTtsEnabledChanged,
@@ -823,6 +826,31 @@ private fun LoadedContent(state: State.Loaded, interactions: Interactions) {
 
             item {
                 Spacer(Modifier.height(2.dp))
+            }
+
+            if (state.phoneSettings.nautilusEnabled) {
+                switchPreference(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .background(color = surface, shape = nautilusShape)
+                        .clip(nautilusShape),
+                    value = state.propertiesState.asLiveTranslateLanguage,
+                    key = "phone_flags_nautilus_phone_language",
+                    title = { _ ->
+                        Text(
+                            text = stringResource(R.string.screen_experiments_phone_nautilus_phone_language),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    },
+                    summary = { _ ->
+                        Text(text = stringResource(R.string.screen_experiments_phone_nautilus_phone_language_summary))
+                    },
+                    onValueChange = interactions.onAsLiveTranslateLanguageChanged
+                )
+
+                item {
+                    Spacer(Modifier.height(2.dp))
+                }
             }
 
             val sonicShape = Shape(phoneFlagsCount, 5)

@@ -106,6 +106,8 @@
     <string name="screen_experiments_phone_feature_beesly_region_ie">@string/screen_experiments_phone_feature_dobby_region_ie</string>
     <string name="screen_experiments_phone_feature_beesly_region_au">@string/screen_experiments_phone_feature_dobby_region_au</string>
     <string name="screen_experiments_phone_feature_nautilus">Voice Translate</string>
+    <string name="screen_experiments_phone_nautilus_phone_language">Voice Translate in Phone Language</string>
+    <string name="screen_experiments_phone_nautilus_phone_language_summary">Offer your phone\'s language in Voice Translate. Android System Intelligence only lists a few languages for calls; yours is added to them. Requires root; restarts Android System Intelligence.</string>
     <string name="screen_experiments_phone_feature_sonic">Audio Emoji</string>
     <string name="screen_experiments_phone_feature_xatu">Direct my Call</string>
     <string name="screen_experiments_phone_feature_caller_tags">Caller Tags</string>

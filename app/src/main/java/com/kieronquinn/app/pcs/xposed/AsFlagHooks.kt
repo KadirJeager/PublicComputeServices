@@ -11,7 +11,8 @@ import java.lang.reflect.Modifier
 /**
  *  Overrides Android System Intelligence's own feature flags by name ([AsFlagOverrides]).
  *
- *  ASI declares each flag as a value object (`BooleanFlag{name=…}`, `StringListFlag{name=…}`)
+ *  ASI declares each flag as a value object (`BooleanFlag{name=…}`, `StringListFlag{name=…}`,
+ *  `StringFlag{name=…}`, the last used for comma separated lists)
  *  and reads every one through one reader interface, which resolves the device_config value and
  *  falls back to the default. The reader's implementations are hooked; a flag with an override
  *  gets it, every other flag keeps the value ASI resolved. Unlike writing device_config, nothing
@@ -25,6 +26,7 @@ internal object AsFlagHooks {
     private const val TAG = "AsHooks"
     private const val BOOLEAN_FLAG = "BooleanFlag{name="
     private const val STRING_LIST_FLAG = "StringListFlag{name="
+    private const val STRING_FLAG = "StringFlag{name="
 
     fun install(dexKit: DexKitBridge, classLoader: ClassLoader, overrides: AsFlagOverrides) {
         if (overrides.isEmpty()) return
@@ -63,10 +65,36 @@ internal object AsFlagHooks {
                     }
                 })
             }
+            val stringReaders = stringReaders(dexKit, classLoader, overrides)
             log("ASI flag overrides installed (${overrides.size}) on " +
-                "${booleanReaders.size + listReaders.size} reader method(s)")
+                "${booleanReaders.size + listReaders.size + stringReaders} reader method(s)")
         } catch (error: Throwable) {
             log("ASI flag overrides unavailable: $error")
+        }
+    }
+
+    /**
+     *  Hooks the string flag readers, for overrides of comma separated lists. Returns the number
+     *  of readers hooked; a failure here leaves the other flags' overrides in place.
+     */
+    private fun stringReaders(dexKit: DexKitBridge, classLoader: ClassLoader, overrides: AsFlagOverrides): Int {
+        return try {
+            val stringFlag = flagClass(dexKit, classLoader, STRING_FLAG)
+            val stringName = nameField(stringFlag)
+            val readers = readers(dexKit, classLoader, stringFlag, String::class.java)
+            readers.forEach { reader ->
+                XposedBridge.hookMethod(reader, object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        val name = stringName.get(param.args[0]) as? String ?: return
+                        val current = param.result as? String ?: return
+                        overrides.commaList(name, current)?.let { param.result = it }
+                    }
+                })
+            }
+            readers.size
+        } catch (error: Throwable) {
+            log("ASI string flag overrides unavailable: $error")
+            0
         }
     }
 
