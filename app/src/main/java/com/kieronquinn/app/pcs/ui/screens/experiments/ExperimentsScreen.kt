@@ -91,6 +91,7 @@ private data class Interactions(
     val onAsNowPlayingChanged: (Boolean) -> Unit,
     val onAsForceGSAChanged: (Boolean) -> Unit,
     val onAiCoreUnloadInferenceChanged: (Boolean) -> Unit,
+    val onAiCoreCallNotesCallLanguageChanged: (Boolean) -> Unit,
     val onClearMddClicked: () -> Unit,
     val onPhoneEnabledChanged: (Boolean) -> Unit,
     val onTtsEnabledChanged: (Boolean) -> Unit,
@@ -137,6 +138,7 @@ private data class Interactions(
             onAsNowPlayingChanged = {},
             onAsForceGSAChanged = {},
             onAiCoreUnloadInferenceChanged = {},
+            onAiCoreCallNotesCallLanguageChanged = {},
             onClearMddClicked = {},
             onPhoneEnabledChanged = {},
             onTtsEnabledChanged = {},
@@ -189,6 +191,7 @@ fun ExperimentsScreen() = ProvidePreferenceLocals {
         onAsNowPlayingChanged = viewModel::onAsNowPlayingChanged,
         onAsForceGSAChanged = viewModel::onAsForceGSAChanged,
         onAiCoreUnloadInferenceChanged = viewModel::onAiCoreUnloadInferenceChanged,
+        onAiCoreCallNotesCallLanguageChanged = viewModel::onAiCoreCallNotesCallLanguageChanged,
         onClearMddClicked = viewModel::onClearMddClicked,
         onPhoneEnabledChanged = viewModel::onPhoneEnabledChanged,
         onTtsEnabledChanged = viewModel::onTtsEnabledChanged,
@@ -1005,6 +1008,31 @@ private fun LoadedContent(state: State.Loaded, interactions: Interactions) {
                     interactions.onPhoneFermatEnabledChanged(it)
                 }
             )
+
+            if (state.phoneSettings.fermatEnabled && state.aicoreAvailable) {
+                item {
+                    Spacer(Modifier.height(2.dp))
+                }
+
+                switchPreference(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .background(color = surface, shape = fermatShape)
+                        .clip(fermatShape),
+                    value = state.propertiesState.aicoreCallNotesCallLanguage,
+                    key = "aicore_call_notes_call_language",
+                    title = { _ ->
+                        Text(
+                            text = stringResource(R.string.screen_experiments_phone_fermat_call_language),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    },
+                    summary = { _ ->
+                        Text(text = stringResource(R.string.screen_experiments_phone_fermat_call_language_summary))
+                    },
+                    onValueChange = interactions.onAiCoreCallNotesCallLanguageChanged
+                )
+            }
 
             if (state.phoneSettings.fermatEnabled && state.callNotesTranslationAvailable) {
                 item {

@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "locale": "tr-TR",
+  "second_person": "always \"siz\", for example \"… sormak için aradınız\", \"… hakkında arandınız\", \"… dediniz\"",
+  "other_person": "karşı taraf"
+}

@@ -39,6 +39,7 @@ class Xposed: IXposedHookLoadPackage {
             }
             PACKAGE_NAME_AIC -> {
                 AiCoreHooks.hook(lpparam)
+                SmartNotesHooks.hook(lpparam)
             }
         }
         if (lpparam.packageName != BuildConfig.APPLICATION_ID &&
