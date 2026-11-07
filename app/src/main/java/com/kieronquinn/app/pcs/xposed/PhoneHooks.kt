@@ -834,7 +834,9 @@ object PhoneHooks: GrpcHooks() {
             PhoneFlag.BEESLY_GREETING_ENABLED -> if (settings.beeslyEnabled) {
                 true
             } else null
-            PhoneFlag.NAUTILUS_ENABLED -> if (settings.nautilusEnabled) {
+            // Live Translate drops every language pair it has no disclaimer for
+            // (NautilusLanguageModelRepository.fetchSupportedLocalePairs); the bypass keeps them.
+            PhoneFlag.NAUTILUS_ENABLED, PhoneFlag.NAUTILUS_BYPASS_DISCLAIMER_AVAILABILITY -> if (settings.nautilusEnabled) {
                 true
             } else null
             PhoneFlag.SONIC_ENABLED -> if (settings.sonicEnabled) {
@@ -855,7 +857,8 @@ object PhoneHooks: GrpcHooks() {
                 true
             } else null
             // Dialer gates both its settings entry and sender UI separately from the service.
-            PhoneFlag.EXPRESSO_ENABLED, PhoneFlag.EXPRESSO_UI_ENABLED -> if (settings.expressoEnabled) {
+            PhoneFlag.EXPRESSO_ENABLED, PhoneFlag.EXPRESSO_UI_ENABLED,
+            PhoneFlag.EXPRESSO_CONTROLLER_ENABLED -> if (settings.expressoEnabled) {
                 true
             } else null
             PhoneFlag.PATRICK_ENABLED -> if (settings.patrickPhase >= PatrickPhase.PHASE_ONE) {
@@ -867,7 +870,9 @@ object PhoneHooks: GrpcHooks() {
             PhoneFlag.PATRICK_PHASE_TWO_ENABLED -> if (settings.patrickPhase >= PatrickPhase.PHASE_TWO) {
                 true
             } else null
-            PhoneFlag.PATRICK_PHASE_TWO_ENABLE_REPOSITORY -> if (settings.patrickPhase >= PatrickPhase.PHASE_TWO) {
+            // PatrickStorage only saves the user's own card ("Your info") with this on
+            PhoneFlag.PATRICK_PHASE_TWO_ENABLE_REPOSITORY,
+            PhoneFlag.PATRICK_CONTACTS_YOUR_INFO -> if (settings.patrickPhase >= PatrickPhase.PHASE_TWO) {
                 true
             } else null
             PhoneFlag.CALL_RECORDING_OVERRIDE_ENABLED -> if (settings.callRecordingEnabled) {
